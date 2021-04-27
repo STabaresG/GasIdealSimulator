@@ -4,6 +4,7 @@ let button;
 
 let table;
 let balls = [];
+let histo;
 
 let sliderm;
 
@@ -13,11 +14,14 @@ let fontsize = 14;
 
 let collisions = 0;
 
+values= [50, 30, 100, 150, 210, 30, 80, 60,50,80,90]
+
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   frameRate(30);
 
   table = new Table(-400, -250, 800, 500);
+  histo= new Histo(480, -260, 350, 350,values); 
 
   button = createButton('Clear');
   button.position(windowWidth - 270, windowHeight / 2 + 150);
@@ -65,9 +69,20 @@ function draw() {
 
     balls[i].update();
     balls[i].show();
+
+  
     
   }
 
+ 
+  histo.show();
+
+  //fill(80);
+
+ 
+  
+
+  
   text("Collisions = " + nfc(collisions, 0), 300, -240);
 
 
@@ -102,6 +117,36 @@ let Table = function (_x, _y, _w, _h) {
 };
 
 
+let Histo = function (_x, _y, _w, _h,_val) {
+  this.x = _x;
+	this.y = _y;
+	this.w = _w;
+  this.h = _h;
+  this.val = _val;
+  
+
+  this.show = function () {
+    noStroke();
+    fill(176,224,230);
+    rect(this.x, this.y, this.w, this.h);
+
+    fill(80);
+
+  for (var k = 0; k < 500; k++) {
+
+  values[0]+=values[0]+0.000001
+
+  for (var j = 0; j < values.length; j++) {
+    rect(j * 25 + 500, 50 - values[j], 20, values[j]);
+  }
+
+}
+    
+    
+  }
+};
+
+
 // creation of billar ball
 let Ball = function (_r, _pos, _vel) {
   this.r = _r;
@@ -125,6 +170,7 @@ let Ball = function (_r, _pos, _vel) {
     this.pos.y += this.vel.y * dt;
 
     this.energy = 0.5*this.mass*this.vel.magSq();
+
   }
 
   this.collision = function (child) {
