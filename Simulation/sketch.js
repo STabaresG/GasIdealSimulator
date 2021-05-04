@@ -14,14 +14,12 @@ let fontsize = 14;
 
 let collisions = 0;
 
-values= [50, 30, 100, 150, 210, 30, 80, 60,50,80,90]
-
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   frameRate(30);
 
   table = new Table(-400, -250, 800, 500);
-  histo= new Histo(480, -260, 350, 350,values); 
+  histo= new Histo(480, -260, 350, 350); 
 
   button = createButton('Clear');
   button.position(windowWidth - 270, windowHeight / 2 + 150);
@@ -73,17 +71,12 @@ function draw() {
   
     
   }
-
- 
-  histo.show();
-
-  //fill(80);
-
- 
   
 
-  
-  text("Collisions = " + nfc(collisions, 0), 300, -240);
+  lista=[random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250)]
+  histo.show(lista);
+
+  text("Collisions = " + nfc(collisions, 0), 300, -280);
 
 
 }
@@ -117,35 +110,33 @@ let Table = function (_x, _y, _w, _h) {
 };
 
 
-let Histo = function (_x, _y, _w, _h,_val) {
+let Histo = function (_x, _y, _w, _h) {
   this.x = _x;
 	this.y = _y;
 	this.w = _w;
   this.h = _h;
-  this.val = _val;
   
 
-  this.show = function () {
+  this.show = function (_val) {
+    this.val = _val;
     noStroke();
     fill(176,224,230);
     rect(this.x, this.y, this.w, this.h);
 
     fill(80);
 
-  for (var k = 0; k < 500; k++) {
+  
 
-  values[0]+=values[0]+0.000001
-
-  for (var j = 0; j < values.length; j++) {
-    rect(j * 25 + 500, 50 - values[j], 20, values[j]);
+  
+  for (var j = 0; j < this.val.length; j++) {
+    rect(j * 25 + 510, 50 - this.val[j], 20, this.val[j]);
   }
 
-}
+
     
     
   }
 };
-
 
 // creation of billar ball
 let Ball = function (_r, _pos, _vel) {
@@ -195,6 +186,7 @@ let Ball = function (_r, _pos, _vel) {
       child.pos.y += 1*child.vel.y * dt;
 
        collisions += 0.5;
+       
     }
   }
 }
