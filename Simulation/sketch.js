@@ -4,14 +4,17 @@ let button;
 
 let table;
 let balls = [];
-let histo;
+let N =100;
 
+let histo;
+let List = [] ;
 let sliderm;
 
 let dt = 1/30;
-
+let bins = 0;
 let fontsize = 14;
-
+let V = [];
+let Vin = [];
 let collisions = 0;
 
 function setup() {
@@ -21,7 +24,7 @@ function setup() {
   table = new Table(-400, -250, 800, 500);
   histo= new Histo(480, -260, 350, 350); 
 
-  button = createButton('Clear');
+  /*button = createButton('Clear');
   button.position(windowWidth - 270, windowHeight / 2 + 150);
   button.mousePressed();
   button.size(70, 20)
@@ -32,7 +35,7 @@ function setup() {
   sliderm.style('width', '200px');
   
   const N = sliderm.value();
-
+*/
   for(let i = 0; i<N; i++) {
     balls.push(new Ball(10, createVector(random(-380,380),random(-230,230)), createVector(random(-30,30), random(-30,30))));
 
@@ -42,21 +45,29 @@ function setup() {
         balls[i].pos.x += 2*balls[i].r;
       }
     }
+    Vin.push(balls[i].vel.magSq());
   }
 
+  bins = (max(Vin)-min(Vin))/100;
+
+  
   textSize(fontsize);
 	textAlign(LEFT, CENTER);
 
 }
 
 function draw() {
+  
   translate(windowWidth / 3, windowHeight / 2);
   background(220);
 
+  for (let k = 0; k < int(bins); k++){
+    List.push(0);
+  }
 
 
   table.show();
-
+  text("bins= " + bins, 430, -280);
   for (let i = 0; i < balls.length; i++) {
     for (let j = i; j < balls.length; j++) {
       if (i !== j) {
@@ -67,18 +78,36 @@ function draw() {
 
     balls[i].update();
     balls[i].show();
-
+    V.push(balls[i].vel.magSq());
   
     
   }
   
+  for (let i = 0; i < balls.length; i++){
 
-  lista=[random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250)]
-  histo.show(lista);
+   for (let k = 0; k < int(bins); k++){
+
+    if (min(Vin)+(k)*100 <= V[i] && V[i] <= min(Vin)+(k+1)*100){
+      List[k] += 1;    
+    }
+    
+    }
+  }
+  //lista=[random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250)]
+  histo.show(List);
 
   text("Collisions = " + nfc(collisions, 0), 300, -280);
 
+  
+  /*for (let k=0;k<List.length;k++){
+    text("histo = " + List[k], 380, -280 + 20*k);
+  }
 
+  text("min = " + min(V), 380, -60  );
+  text("max = " + max(V), 380, -40  );
+  */
+  V.splice(0, V.length);
+  List.splice(0, List.length);
 }
 
 
@@ -129,7 +158,7 @@ let Histo = function (_x, _y, _w, _h) {
 
   
   for (var j = 0; j < this.val.length; j++) {
-    rect(j * 25 + 510, 50 - this.val[j], 20, this.val[j]);
+    rect(j * 25 + 510, 50 - 5*this.val[j], 20, 5*this.val[j]);
   }
 
 
@@ -160,28 +189,36 @@ let Ball = function (_r, _pos, _vel) {
     this.pos.x += this.vel.x * dt;
     this.pos.y += this.vel.y * dt;
 
-    this.energy = 0.5*this.mass*this.vel.magSq();
+    //this.energy = 0.5*this.mass*this.vel.magSq();
 
   }
 
   this.collision = function (child) {
     let d = dist(this.pos.x, this.pos.y, child.pos.x, child.pos.y);
-    let dv = this.pos.copy().sub(child.pos); 
+    let r_ij = this.pos.copy().sub(child.pos).normalize();
+    
+    let v_ij = this.vel.copy().sub(child.vel);
+    
 
-    let en = (this.energy + child.energy) / 2;
+    //let en = (this.energy + child.energy) / 2;
 
-    if (d < (this.r/2 + child.r/2 + (0.1 * child.r/2))) {
-      let newMag = sqrt((2*en)/this.mass);
+    if (d < (this.r/2 + child.r/2 + (0.05 * child.r/2))) {
+      //let newMag = sqrt((2*en)/this.mass);
       
       
-      this.vel.reflect(dv);
-      this.vel.setMag(newMag);
+      let q = -v_ij.dot(r_ij);
+
+      this.vel.x += q*r_ij.x;
+      
+      this.vel.y += q*r_ij.y;
+      //this.vel.setMag(newMag);
       this.pos.x += 1*this.vel.x * dt;
       this.pos.y += 1*this.vel.y * dt;
 
       
-       child.vel.reflect(dv);
-       child.vel.setMag(newMag);
+       child.vel.x -=  q*r_ij.x;
+       child.vel.y -= q*r_ij.y;
+       //child.vel.setMag(newMag);
        child.pos.x += 1*child.vel.x * dt;
       child.pos.y += 1*child.vel.y * dt;
 
