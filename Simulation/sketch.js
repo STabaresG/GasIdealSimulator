@@ -9,6 +9,7 @@ let N =100;
 let histo;
 let List = [] ;
 let sliderm;
+let temperatura;
 
 let dt = 1/30;
 let bins = 0;
@@ -21,8 +22,10 @@ function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   frameRate(30);
 
-  table = new Table(-400, -250, 800, 500);
+  table = new Table(-250, -200, 500, 400);
   histo= new Histo(480, -260, 350, 350); 
+  fogon= new Fogon(-250, 200 , 500, 70); 
+
 
   /*button = createButton('Clear');
   button.position(windowWidth - 270, windowHeight / 2 + 150);
@@ -33,11 +36,16 @@ function setup() {
   sliderm = createSlider(30, 200, 30, 1);
   sliderm.position(windowWidth - 300, windowHeight / 2 + 100);
   sliderm.style('width', '200px');
+
+  // creacion de un slider
+  temperatura = createSlider(0, 200, 0, 5);
+  temperatura.position(windowWidth - 300, windowHeight / 2 + 200);
+  temperatura.style('width', '200px');
   
   const N = sliderm.value();
 */
   for(let i = 0; i<N; i++) {
-    balls.push(new Ball(10, createVector(random(-380,380),random(-230,230)), createVector(random(-30,30), random(-30,30))));
+    balls.push(new Ball(9, createVector(random(-240,240),random(-190,190)), createVector(random(-30,30), random(-30,30))));
 
     for(let j = 0; j < i; j++) {
       let d = dist(balls[i].pos.x, balls[i].pos.y, balls[j].pos.x, balls[j].pos.y);
@@ -166,6 +174,24 @@ let Histo = function (_x, _y, _w, _h) {
     
   }
 };
+
+let Fogon= function (_x, _y, _w, _h) {
+  this.x = _x;
+	this.y = _y;
+	this.w = _w;
+  this.h = _h;
+  
+
+  this.show = function (_val) {
+    this.val = _val;
+    noStroke();
+    fill(255,200-this.val,0);
+    rect(this.x, this.y, this.w, this.h);
+
+    fill(80)   
+  }
+};
+
 
 // creation of billar ball
 let Ball = function (_r, _pos, _vel) {
