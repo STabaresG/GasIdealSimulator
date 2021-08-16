@@ -6,6 +6,7 @@ let table;
 let balls = [];
 let N =100;
 
+let sel;
 let histo;
 let List = [] ;
 let sliderm;
@@ -23,9 +24,15 @@ function setup() {
   frameRate(30);
 
   table = new Table(-250, -200, 500, 400);
-  histo= new Histo(480, -260, 430, 350); 
-  fogon= new Fogon(-250, 200 , 500, 70); 
+  histo = new Histo(480, -260, 430, 350); 
+  fogon = new Fogon(-250, 200 , 500, 70); 
 
+  sel = createSelect();
+  sel.option('Distribución Uniforme')
+  sel.option('Distribución Normal')
+  sel.option('Solo una partícula')
+  sel.position(400, 100)
+  //textAlign(CENTER)
 
   /*button = createButton('Clear');
   button.position(windowWidth - 270, windowHeight / 2 + 150);
@@ -39,10 +46,10 @@ function setup() {
   */
 
   // creacion de un slider
-  temperatura = createSlider(0, 200, 0, 5);
+  temperatura = createSlider(1, 100, 1, 10);
   temperatura.position(windowWidth - 300, windowHeight / 2 + 200);
   temperatura.style('width', '200px');
-  
+  let valSlider = temperatura.value()
   //const N = sliderm.value();
 
   for(let i = 0; i<N; i++) {
