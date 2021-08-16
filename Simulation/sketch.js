@@ -12,18 +12,21 @@ let sliderm;
 let temperatura;
 
 let dt = 1/30;
-let bins = 0;
+let bins = 15;
+let xi;
 let fontsize = 14;
 let V = [];
 let Vin = [];
 let collisions = 0;
+let t = 0;
+let savetxt;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   frameRate(30);
 
-  table = new Table(-250, -200, 500, 400);
-  histo= new Histo(480, -260, 350, 350); 
+  table = new Table(-250, -200, 300, 300);
+  histo= new Histo(480, -260, 420, 420); 
   fogon= new Fogon(-250, 200 , 500, 70); 
 
 
@@ -44,8 +47,9 @@ function setup() {
   
   const N = sliderm.value();
 */
+  Vin.push(0);
   for(let i = 0; i<N; i++) {
-    balls.push(new Ball(9, createVector(random(-240,240),random(-190,190)), createVector(random(-30,30), random(-30,30))));
+    balls.push(new Ball(10, createVector(random(-230,30),random(-180,80)), createVector(random(-14.5,14.5), random(-14.5,14.5))));
 
     for(let j = 0; j < i; j++) {
       let d = dist(balls[i].pos.x, balls[i].pos.y, balls[j].pos.x, balls[j].pos.y);
@@ -53,22 +57,28 @@ function setup() {
         balls[i].pos.x += 2*balls[i].r;
       }
     }
-    Vin.push(balls[i].vel.magSq());
+    Vin.push(balls[i].vel.mag());
   }
 
-  bins = (max(Vin)-min(Vin))/100;
+  //xi = (max(Vin)-min(Vin))/bins;
 
+  savetxt = createButton("Save");
+  savetxt.position(450, 480);
+  savetxt.mousePressed(saveAsText);
   
   textSize(fontsize);
 	textAlign(LEFT, CENTER);
 
 }
 
+
+
+
 function draw() {
   
   translate(windowWidth / 3, windowHeight / 2);
   background(220);
-
+  t += dt; 
   for (let k = 0; k < int(bins); k++){
     List.push(0);
   }
@@ -86,16 +96,17 @@ function draw() {
 
     balls[i].update();
     balls[i].show();
-    V.push(balls[i].vel.magSq());
+    V.push(balls[i].vel.mag());
   
     
   }
-  
+  xi = (max(V))/bins;
+
   for (let i = 0; i < balls.length; i++){
 
    for (let k = 0; k < int(bins); k++){
 
-    if (min(Vin)+(k)*100 <= V[i] && V[i] <= min(Vin)+(k+1)*100){
+    if (((k)*xi) <= V[i] && V[i] <= (k+1)*xi){
       List[k] += 1;    
     }
     
@@ -104,21 +115,35 @@ function draw() {
   //lista=[random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250)]
   histo.show(List);
 
+   
   text("Collisions = " + nfc(collisions, 0), 300, -280);
+  text("time = " + nfc(t, 2), 300, -260);
 
-  
-  /*for (let k=0;k<List.length;k++){
-    text("histo = " + List[k], 380, -280 + 20*k);
+  /*if (collisions == 500){
+    save(V, 'velocidades.txt');
   }
-
-  text("min = " + min(V), 380, -60  );
-  text("max = " + max(V), 380, -40  );
   */
+  /*for (let k=0;k<10;k++){
+    text("histo = " + Vin[k], 320, -240 + 20*k);
+  }
+*/
+  //text("min = " + min(V), 380, -60  );
+  //text("max = " + max(V), 380, -40  );
+  
+  
   V.splice(0, V.length);
   List.splice(0, List.length);
 }
 
 
+function saveAsText() {
+  let textToSave = [];
+  for (let i = 0; i < balls.length; i++) {
+    textToSave.push(balls[i].vel.mag());
+  }
+  
+  save(textToSave, "output.txt");
+}
 // creation of billar table
 let Table = function (_x, _y, _w, _h) {
   this.x = _x;
@@ -166,7 +191,7 @@ let Histo = function (_x, _y, _w, _h) {
 
   
   for (var j = 0; j < this.val.length; j++) {
-    rect(j * 25 + 510, 50 - 5*this.val[j], 20, 5*this.val[j]);
+    rect(j * 20 + 490, 50 - 10*this.val[j], 20, 10*this.val[j]);
   }
 
 
@@ -228,25 +253,25 @@ let Ball = function (_r, _pos, _vel) {
 
     //let en = (this.energy + child.energy) / 2;
 
-    if (d < (this.r/2 + child.r/2 + (0.05 * child.r/2))) {
+    if (d < (this.r/2 + child.r/2 )) {
       //let newMag = sqrt((2*en)/this.mass);
+      let overlap = this.r - d;
       
-      
-      let q = -v_ij.dot(r_ij);
+      let q = -2*this.mass*child.mass*v_ij.dot(r_ij)/(this.mass + child.mass);
 
       this.vel.x += q*r_ij.x;
       
       this.vel.y += q*r_ij.y;
       //this.vel.setMag(newMag);
-      this.pos.x += 1*this.vel.x * dt;
-      this.pos.y += 1*this.vel.y * dt;
+      this.pos.x += overlap*r_ij.x ;
+      this.pos.y += overlap*r_ij.y ;
 
       
        child.vel.x -=  q*r_ij.x;
        child.vel.y -= q*r_ij.y;
        //child.vel.setMag(newMag);
-       child.pos.x += 1*child.vel.x * dt;
-      child.pos.y += 1*child.vel.y * dt;
+       child.pos.x += -overlap*r_ij.x ;
+       child.pos.y += -overlap*r_ij.y ;
 
        collisions += 0.5;
        
