@@ -16,7 +16,6 @@ let bins = 15;
 let xi;
 let fontsize = 14;
 let V = [];
-let Vin = [];
 let collisions = 0;
 let t = 0;
 let savetxt;
@@ -26,8 +25,8 @@ function setup() {
   frameRate(30);
 
   table = new Table(-250, -200, 300, 300);
-  histo= new Histo(480, -260, 420, 420); 
-  fogon= new Fogon(-250, 200 , 500, 70); 
+  histo= new Histo(140, -200, 370, 300); 
+  fogon= new Fogon(-250, 100 , 300, 70); 
 
 
   /*button = createButton('Clear');
@@ -39,15 +38,15 @@ function setup() {
   sliderm = createSlider(30, 200, 30, 1);
   sliderm.position(windowWidth - 300, windowHeight / 2 + 100);
   sliderm.style('width', '200px');
+  */
 
   // creacion de un slider
   temperatura = createSlider(0, 200, 0, 5);
-  temperatura.position(windowWidth - 300, windowHeight / 2 + 200);
+  temperatura.position(windowWidth - 1100, windowHeight / 2 + 200);
   temperatura.style('width', '200px');
   
-  const N = sliderm.value();
-*/
-  Vin.push(0);
+  //const N = sliderm.value();
+
   for(let i = 0; i<N; i++) {
     balls.push(new Ball(10, createVector(random(-230,30),random(-180,80)), createVector(random(-14.5,14.5), random(-14.5,14.5))));
 
@@ -57,13 +56,13 @@ function setup() {
         balls[i].pos.x += 2*balls[i].r;
       }
     }
-    Vin.push(balls[i].vel.mag());
+    
   }
 
   //xi = (max(Vin)-min(Vin))/bins;
 
   savetxt = createButton("Save");
-  savetxt.position(450, 480);
+  savetxt.position(780, 440);
   savetxt.mousePressed(saveAsText);
   
   textSize(fontsize);
@@ -115,14 +114,13 @@ function draw() {
   //lista=[random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250)]
   histo.show(List);
 
-   
+  let colort = temperatura.value();
+  fogon.show(colort);
+
   text("Collisions = " + nfc(collisions, 0), 300, -280);
   text("time = " + nfc(t, 2), 300, -260);
 
-  /*if (collisions == 500){
-    save(V, 'velocidades.txt');
-  }
-  */
+
   /*for (let k=0;k<10;k++){
     text("histo = " + Vin[k], 320, -240 + 20*k);
   }
@@ -184,14 +182,23 @@ let Histo = function (_x, _y, _w, _h) {
     noStroke();
     fill(176,224,230);
     rect(this.x, this.y, this.w, this.h);
+    fill(0);
+    rect(this.x+26, this.y+this.h-50, this.w-26, 2); //eje x
+    textStyle(BOLD);
+    text('velocidades',this.x+this.w/2 -15 , this.y+this.h -20);
+    fill(0);
+    rect(this.x+26, this.y, 2, this.h-50); //eje y
+    text('N',this.x+5 ,this.y+this.h/2 - 10);
 
     fill(80);
+    
+
 
   
 
   
   for (var j = 0; j < this.val.length; j++) {
-    rect(j * 20 + 490, 50 - 10*this.val[j], 20, 10*this.val[j]);
+    rect(j * 20 + 180, 50 - 10*this.val[j], 20, 10*this.val[j]);
   }
 
 
