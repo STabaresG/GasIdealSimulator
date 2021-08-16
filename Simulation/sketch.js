@@ -23,7 +23,7 @@ function setup() {
   frameRate(30);
 
   table = new Table(-250, -200, 500, 400);
-  histo= new Histo(480, -260, 350, 350); 
+  histo= new Histo(480, -260, 430, 350); 
   fogon= new Fogon(-250, 200 , 500, 70); 
 
 
@@ -36,14 +36,15 @@ function setup() {
   sliderm = createSlider(30, 200, 30, 1);
   sliderm.position(windowWidth - 300, windowHeight / 2 + 100);
   sliderm.style('width', '200px');
+  */
 
   // creacion de un slider
   temperatura = createSlider(0, 200, 0, 5);
   temperatura.position(windowWidth - 300, windowHeight / 2 + 200);
   temperatura.style('width', '200px');
   
-  const N = sliderm.value();
-*/
+  //const N = sliderm.value();
+
   for(let i = 0; i<N; i++) {
     balls.push(new Ball(9, createVector(random(-240,240),random(-190,190)), createVector(random(-30,30), random(-30,30))));
 
@@ -104,6 +105,9 @@ function draw() {
   //lista=[random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250)]
   histo.show(List);
 
+  let colort = temperatura.value();
+  fogon.show(colort);
+
   text("Collisions = " + nfc(collisions, 0), 300, -280);
 
   
@@ -159,14 +163,23 @@ let Histo = function (_x, _y, _w, _h) {
     noStroke();
     fill(176,224,230);
     rect(this.x, this.y, this.w, this.h);
+    fill(0);
+    rect(this.x+26, this.y+this.h-40, this.w-26, 2); //eje x
+    textStyle(BOLD);
+    text('velocidades',this.x+this.w/2 , this.y+this.h);
+    fill(0);
+    rect(this.x+26, this.y, 2, this.h-40); //eje y
+    text('N',this.x-5 ,this.y+this.h/2);
 
     fill(80);
+    
+
 
   
 
   
   for (var j = 0; j < this.val.length; j++) {
-    rect(j * 25 + 510, 50 - 5*this.val[j], 20, 5*this.val[j]);
+    rect(j * 25 + 510, 50 - 14*this.val[j], 20, 14*this.val[j]);
   }
 
 
