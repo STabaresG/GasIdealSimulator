@@ -28,7 +28,7 @@ function setup() {
   frameRate(30);
 
   table = new Table(-250, -200, 300, 300);
-  histo= new Histo(140, -200, 370, 300); 
+  histo= new Histo(140, -200, 370, 370); 
   fogon= new Fogon(-250, 100 , 300, 70); 
 
   sel = createSelect();
@@ -73,7 +73,7 @@ function setup() {
   //xi = (max(Vin)-min(Vin))/bins;
 
   savetxt = createButton("Guardar");
-  savetxt.position(780, 440);
+  savetxt.position(windowWidth - 550, windowHeight / 2 + 200);
   savetxt.mousePressed(saveAsText);
   
   textSize(fontsize);
@@ -257,7 +257,7 @@ let Histo = function (_x, _y, _w, _h) {
 
   
   for (var j = 0; j < this.val.length; j++) {
-    rect(j * 20 + 180, 50 - 10*this.val[j], 20, 10*this.val[j]);
+    rect(j * 20 + 180, 120 - 10*this.val[j], 20, 10*this.val[j]);
   }
 
 
