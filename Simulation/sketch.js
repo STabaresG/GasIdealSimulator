@@ -1,10 +1,9 @@
-
+// Inicialización de todas las variables de la simulación 
 let canvas;
-let button;
 
 let table;
 let balls = [];
-let N = 130;
+let N = 130; // Número de bolas
 
 let sel;
 let histo;
@@ -14,7 +13,7 @@ let temperatura;
 let valSlider = 0;
 let newValSlider = 0;
 
-let dt = 1/30;
+let dt = 1/30; // Tiempo paso de evolución de la simulación 
 let bins = 15;
 let xi;
 let fontsize = 14;
@@ -24,12 +23,15 @@ let t = 0;
 let savetxt;
 
 function setup() {
+
+  //Declaración de clases 
+
   canvas = createCanvas(windowWidth, windowHeight);
   frameRate(30);
 
-  table = new Table(-250, -200, 300, 300);
-  histo= new Histo(140, -200, 370, 370); 
-  fogon= new Fogon(-250, 100 , 300, 70); 
+  table = new Table(-250, -200, 300, 300); //Caja 2D donde se distribuyen las bolas
+  histo= new Histo(140, -200, 370, 370);  //Histograma de velocidades 
+  fogon= new Fogon(-250, 100 , 300, 70);  //Representación gráfica de un fogón al aumentar la temperatura
 
   sel = createSelect();
   sel.option('Distribución Uniforme')
@@ -38,16 +40,6 @@ function setup() {
   sel.position(270, 50)
   //textAlign(CENTER)
 
-  /*button = createButton('Clear');
-  button.position(windowWidth - 270, windowHeight / 2 + 150);
-  button.mousePressed();
-  button.size(70, 20)
-
-  // creacion de un slider
-  sliderm = createSlider(30, 200, 30, 1);
-  sliderm.position(windowWidth - 300, windowHeight / 2 + 100);
-  sliderm.style('width', '200px');
-  */
 
   // creacion de un slider
   temperatura = createSlider(0, 30, newValSlider, 3);
@@ -55,9 +47,12 @@ function setup() {
   temperatura.style('width', '200px');
   valSlider = temperatura.value();
 
+  //Creación de bolas que son agregadas a una lista 
   for(let i = 0; i<N; i++) {
     balls.push(new Ball(10, createVector(random(-220,20),random(-180,80)), createVector(random(-10 - valSlider ,10 + valSlider), random(-10 - valSlider ,10 + valSlider))));
+    //Cada bola se crea en la caja con una posición y velocidad aleatoria
 
+    //Condición para que las bolas no aparezcan solapadas cuando se crean  
     for(let j = 0; j < i; j++) {
       let d = dist(balls[i].pos.x, balls[i].pos.y, balls[j].pos.x, balls[j].pos.y);
       if (d <= balls[i].r) {
@@ -70,8 +65,9 @@ function setup() {
   temperatura.changed(cambioTemp);
   sel.changed(cambioTemp);
   
-  //xi = (max(Vin)-min(Vin))/bins;
-
+ 
+  // Creación de un botón que permite guardar las velocidades en el instante que se presiona, mediante
+  // la función saveASText.
   savetxt = createButton("Guardar");
   savetxt.position(windowWidth - 550, windowHeight / 2 + 200);
   savetxt.mousePressed(saveAsText);
@@ -83,62 +79,58 @@ function setup() {
 
 
 function draw() {
-  
+  //Función draw es un ciclo que se está corriendo constantemente 
+
   translate(windowWidth / 3, windowHeight / 2);
   background(220);
-  t += dt; 
+  t += dt; // Tiempo transcurrido de la simulación 
+
   for (let k = 0; k < int(bins); k++){
-    List.push(0);
+    List.push(0); // lista con las frecuancias para el histograma. Se define con todas sus entradas 0 
+    //                cada vez que empieza un ciclo  
   }
 
 
-  table.show();
+  table.show(); //Muestra la caja 2D
   text("bins= " + bins, 430, -280);
   for (let i = 0; i < balls.length; i++) {
     for (let j = i; j < balls.length; j++) {
       if (i !== j) {
-        balls[i].collision(balls[j]);
+        balls[i].collision(balls[j]); //Función, actualiza la velocidad de las bola i 
+        //si cumple que va a chocar con la bola j
       }
     }
-    table.collision(balls[i]);
+    table.collision(balls[i]); //Función, actualiza la velocidad de las bola i 
+    //si cumple que va a chocar con una pared de la caja
 
-    balls[i].update();
-    balls[i].show();
-    V.push(balls[i].vel.mag());
+    balls[i].update(); //Actualiza la posición de las bolas en el tiempo dt con sus respectivas velocidades
+    balls[i].show(); //Muestra las bolas 
+    V.push(balls[i].vel.mag()); // Agrega las velocidades de cada bola a una lista 
   
     
   }
-  xi = (max(V))/bins;
+  xi = (max(V))/bins; //Define el rango de cada bin en el histograma 
 
   for (let i = 0; i < balls.length; i++){
 
    for (let k = 0; k < int(bins); k++){
 
     if (((k)*xi) <= V[i] && V[i] <= (k+1)*xi){
-      List[k] += 1;    
+      List[k] += 1;    //Llenamos la lista de frecuencias según el rango de velocidad de cada bin
     }
     
     }
   }
-  //lista=[random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250),random(250)]
-  histo.show(List);
+  histo.show(List); //Muestra el histograma 
 
   let colort = temperatura.value();
   fogon.show(colort);
 
   text("Collisions = " + nfc(collisions, 0), 300, -280);
   text("time = " + nfc(t, 2), 300, -260);
-
-
-  /*for (let k=0;k<10;k++){
-    text("histo = " + Vin[k], 320, -240 + 20*k);
-  }
-*/
-  //text("min = " + min(V), 380, -60  );
-  //text("max = " + max(V), 380, -40  );
   
-  
-  V.splice(0, V.length);
+  //Reiniciamos las listas de velocidades y frecuencia 
+  V.splice(0, V.length); 
   List.splice(0, List.length);
 }
 
@@ -197,28 +189,30 @@ collisions = 0;
 
 }
 
-function saveAsText() {
+function saveAsText() { //Esta función sirve para guardar las velocidades en un archivo txt 
   let textToSave = [];
   for (let i = 0; i < balls.length; i++) {
-    textToSave.push(balls[i].vel.mag());
+    textToSave.push(balls[i].vel.mag()); //Lista con todas las velocidades
   }
   
-  save(textToSave, "output.txt");
+  save(textToSave, "output.txt"); //Guarda archivo txt con la lista 
 }
 // caja de las particulas del gas
-let Table = function (_x, _y, _w, _h) {
+let Table = function (_x, _y, _w, _h) { //Clase que define la caja 2D
+  //Posición
   this.x = _x;
 	this.y = _y;
 	this.w = _w;
 	this.h = _h;
 
-  this.show = function () {
+  this.show = function () { //Muestra la caja con su color y posición 
     noStroke();
     fill(80);
     rect(this.x, this.y, this.w, this.h);
   }
-
-  this.collision = function (child) {
+  
+  this.collision = function (child) { //Esta función se le ingresa una bola con todas sus variables de clase
+    //y se busca si la bola va chocar con una pared y según su choque se cambia su velocidad en dirección contraria
     if ((child.pos.x < this.x +child.r/2) || (child.pos.x > this.x + this.w -child.r/2) ) {
       child.pos.x -= child.vel.x * dt;
       child.vel.x *= -1;
@@ -287,56 +281,56 @@ let Fogon = function (_x, _y, _w, _h) {
 
 // Creacion de las particulas del gas
 let Ball = function (_r, _pos, _vel) {
-  this.r = _r;
+  //Variables de una bola 
+  this.r = _r; //radio
   this.pos = _pos;
   this.vel = _vel;
-  this.mass = 1;
-  this.moment = this.mass * this.vel;
-  this.energy = 0.5*this.mass*this.vel.magSq();
+  this.mass = 1; // masa por defecto 1
 
-  this.show = function() {
+
+  this.show = function() { // Muestra la bola en su posición y color
     noStroke();
     fill(180);
     ellipse(this.pos.x, this.pos.y, this.r, this.r);
   }
 
-  this.update = function () {
+  this.update = function () { 
     //
 
-    // update the position
+    // Actualiza la posición de las bolas en un tiempo dt
     this.pos.x += this.vel.x * dt;
     this.pos.y += this.vel.y * dt;
 
-    //this.energy = 0.5*this.mass*this.vel.magSq();
 
   }
   // Colision y conservacion del momento
   this.collision = function (child) {
-    let d = dist(this.pos.x, this.pos.y, child.pos.x, child.pos.y);
-    let r_ij = this.pos.copy().sub(child.pos).normalize();
     
-    let v_ij = this.vel.copy().sub(child.vel);
+    let d = dist(this.pos.x, this.pos.y, child.pos.x, child.pos.y); //Distancia entre bolas 
+    let r_ij = this.pos.copy().sub(child.pos).normalize(); //vector de posición relativa normalizado
     
+    let v_ij = this.vel.copy().sub(child.vel); ////vector de velocidad relativa normalizado
+  
 
-    //let en = (this.energy + child.energy) / 2;
-
-    if (d < (this.r/2 + child.r/2 )) {
-      //let newMag = sqrt((2*en)/this.mass);
+    if (d < (this.r/2 + child.r/2 )) {//Condición de choque entre bolas 
+    
       let overlap = this.r - d;
       
-      let q = -2*this.mass*child.mass*v_ij.dot(r_ij)/(this.mass + child.mass);
+      let q = -2*this.mass*child.mass*v_ij.dot(r_ij)/(this.mass + child.mass); //Momento de intercambio entre bolas
 
-      this.vel.x += q*r_ij.x;
-      
+      // Actualización de velocidades
+      this.vel.x += q*r_ij.x; 
       this.vel.y += q*r_ij.y;
-      //this.vel.setMag(newMag);
-      this.pos.x += overlap*r_ij.x ;
+
+      this.pos.x += overlap*r_ij.x ; //Se cambia la posición por un factor pequeño 
+      //                               para evitar que las bolas se solapen y vuelvan a chocar
+      //                               por errores númericos 
       this.pos.y += overlap*r_ij.y ;
 
       
        child.vel.x -=  q*r_ij.x;
        child.vel.y -= q*r_ij.y;
-       //child.vel.setMag(newMag);
+
        child.pos.x += -overlap*r_ij.x ;
        child.pos.y += -overlap*r_ij.y ;
 
