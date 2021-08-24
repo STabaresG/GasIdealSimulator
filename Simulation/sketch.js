@@ -6,6 +6,10 @@ let table;
 let balls = [];
 let N = 130;
 
+let bugs = [];
+let numBugs = 40;
+let particles = [];
+
 let sel;
 let histo;
 let List = [] ;
@@ -29,7 +33,7 @@ function setup() {
 
   table = new Table(-250, -200, 300, 300);
   histo= new Histo(140, -200, 370, 370); 
-  fogon= new Fogon(-250, 100 , 300, 70); 
+  //fogon= new Fogon(-250, 100 , 300, 70); 
 
   sel = createSelect();
   sel.option('Distribución Uniforme')
@@ -84,12 +88,14 @@ function setup() {
 
 function draw() {
   
+  
   translate(windowWidth / 3, windowHeight / 2);
-  background(220);
+  background(255,255,255);
   t += dt; 
   for (let k = 0; k < int(bins); k++){
     List.push(0);
   }
+  
 
 
   table.show();
@@ -124,7 +130,7 @@ function draw() {
   histo.show(List);
 
   let colort = temperatura.value();
-  fogon.show(colort);
+  //fogon.show(colort);
 
   text("Collisions = " + nfc(collisions, 0), 300, -280);
   text("time = " + nfc(t, 2), 300, -260);
@@ -140,13 +146,68 @@ function draw() {
   
   V.splice(0, V.length);
   List.splice(0, List.length);
+
+  for (let i = 0; i < 5; i++) {
+    let p = new Particle();
+    particles.push(p);
+  }
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update();
+    particles[i].show();
+    if (particles[i].finished()) {
+      particles.splice(i, 1);
+    }
+  }
+  fill(0, 0, 0);
+  rect(-250, 140, 300, 30);
+
 }
+
+
+
+class Particle {
+  constructor() {
+  let valSlider = temperatura.value();
+    this.x = random(-240, 40);
+    this.y = 140;
+    this.vx = random(-1, 1);
+    this.vy = random(-1.6, -0.5);
+    this.alpha = 140+valSlider*3;
+    this.d = 12 + valSlider/7;
+  }
+
+  finished() {
+    return this.alpha < 0;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.alpha -= 4;
+    this.d -= random(0.05, 0.1);
+  }
+
+  show() {
+  let valSlider = temperatura.value();
+    noStroke();
+    fill(random(210,250), random(160- valSlider*3, 180-valSlider*3), 10, this.alpha);
+    ellipse(this.x, this.y, this.d);
+  }
+
+}
+
+
+
 
 function cambioTemp() {
   let valSlider = temperatura.value();
   balls.splice(0,balls.length);
 
   let item = sel.value();
+  particles.splice(0,particles.length);
+  //p.splice(0,p.length);
+
+
 
   if (item == "Distribución Uniforme"){
     for(let i = 0; i<N; i++) {
@@ -197,6 +258,7 @@ collisions = 0;
 
 }
 
+
 function saveAsText() {
   let textToSave = [];
   for (let i = 0; i < balls.length; i++) {
@@ -214,7 +276,7 @@ let Table = function (_x, _y, _w, _h) {
 
   this.show = function () {
     noStroke();
-    fill(80);
+    fill(0,0,0);
     rect(this.x, this.y, this.w, this.h);
   }
 
@@ -243,7 +305,7 @@ let Histo = function (_x, _y, _w, _h) {
   this.show = function (_val) {
     this.val = _val;
     noStroke();
-    fill(176,224,230);
+    fill(255,255,255);
     rect(this.x, this.y, this.w, this.h);
     fill(0);
     rect(this.x+26, this.y+this.h-50, this.w-26, 2); //eje x
@@ -253,36 +315,19 @@ let Histo = function (_x, _y, _w, _h) {
     rect(this.x+26, this.y, 2, this.h-50); //eje y
     text('N',this.x+5 ,this.y+this.h/2 - 10);
 
-    fill(80);
+    fill(0,0,0);
 
   
   for (var j = 0; j < this.val.length; j++) {
     rect(j * 20 + 180, 120 - 10*this.val[j], 20, 10*this.val[j]);
   }
-
-
-    
     
   }
 };
 
-// funcion que simula el fogon
-let Fogon = function (_x, _y, _w, _h) {
-  this.x = _x;
-	this.y = _y;
-	this.w = _w;
-  this.h = _h;
-  
 
-  this.show = function (_val) {
-    this.val = _val;
-    noStroke();
-    fill(255,200-this.val*5,0);
-    rect(this.x, this.y, this.w, this.h);
 
-    fill(80)   
-  }
-};
+
 
 
 // Creacion de las particulas del gas
@@ -296,7 +341,7 @@ let Ball = function (_r, _pos, _vel) {
 
   this.show = function() {
     noStroke();
-    fill(180);
+    fill(0,76,153);
     ellipse(this.pos.x, this.pos.y, this.r, this.r);
   }
 
