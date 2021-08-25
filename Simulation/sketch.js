@@ -44,7 +44,7 @@ function setup() {
   //textAlign(CENTER)
 
 
-  // creacion de un slider
+  // creacion de un deslizador para variar la temperatura
   temperatura = createSlider(0, 30, newValSlider, 3);
   temperatura.position(windowWidth - 1100, windowHeight / 2 + 200);
   temperatura.style('width', '200px');
@@ -96,7 +96,7 @@ function draw() {
 
 
   table.show(); //Muestra la caja 2D
-  text("bins= " + bins, 430, -280);
+  text("Bines = " + bins, 450, -280);
   for (let i = 0; i < balls.length; i++) {
     for (let j = i; j < balls.length; j++) {
       if (i !== j) {
@@ -127,11 +127,11 @@ function draw() {
   }
   histo.show(List); //Muestra el histograma 
 
-  let colort = temperatura.value();
+  let colort = temperatura.value(); //Asigna valor de deslizador de temperatura para asociar a color de llamas
   //fogon.show(colort);
 
-  text("Collisions = " + nfc(collisions, 0), 300, -280);
-  text("time = " + nfc(t, 2), 300, -260);
+  text("Colisiones = " + nfc(collisions, 0), 300, -280);
+  text("Tiempo = " + nfc(t, 2), 300, -260);
   
   //Reiniciamos las listas de velocidades y frecuencia 
   V.splice(0, V.length); 
@@ -190,7 +190,7 @@ class Particle {
 
 
 function cambioTemp() {
-  let valSlider = temperatura.value();
+  let valSlider = temperatura.value(); //Asignar el valor del 
   balls.splice(0,balls.length);
 
   let item = sel.value();
@@ -287,30 +287,31 @@ let Table = function (_x, _y, _w, _h) { //Clase que define la caja 2D
 
 // Histograma de las velocidades
 let Histo = function (_x, _y, _w, _h) {
-  this.x = _x;
-	this.y = _y;
-	this.w = _w;
-  this.h = _h;
+  this.x = _x; //posicion en x de histograma
+	this.y = _y; //posicion en y de histograma
+	this.w = _w; //ancho  de histograma
+  this.h = _h; //alto de histograma
   
 
-  this.show = function (_val) {
+  this.show = function (_val) { //definicion de función show para el hsitograma
     this.val = _val;
     noStroke();
-    fill(255,255,255);
-    rect(this.x, this.y, this.w, this.h);
+    fill(255,255,255); 
+    rect(this.x, this.y, this.w, this.h); //espacio para el histograma
     fill(0);
     rect(this.x+26, this.y+this.h-50, this.w-26, 2); //eje x
     textStyle(BOLD);
-    text('velocidades',this.x+this.w/2 -15 , this.y+this.h -20);
+    text('velocidades',this.x+this.w/2 -15 , this.y+this.h -20); //Etiqueta eje x
     fill(0);
     rect(this.x+26, this.y, 2, this.h-50); //eje y
-    text('N',this.x+5 ,this.y+this.h/2 - 10);
+    text('N',this.x+5 ,this.y+this.h/2 - 10); //Etiqueta eje x
 
     fill(0,0,0);
+    stroke(0,76,153);
 
-  
+  // Definiendo las barras para que se actualicen constantemente
   for (var j = 0; j < this.val.length; j++) {
-    rect(j * 20 + 180, 120 - 10*this.val[j], 20, 10*this.val[j]);
+    rect(j * 20 + 180, 120 - 10*this.val[j], 20, 10*this.val[j]); 
   }
     
   }
@@ -323,6 +324,7 @@ let Histo = function (_x, _y, _w, _h) {
 
 // Creacion de las particulas del gas
 let Ball = function (_r, _pos, _vel) {
+  
   //Variables de una bola 
   this.r = _r; //radio
   this.pos = _pos;
