@@ -5,15 +5,14 @@ let table;
 let balls = [];
 let N = 130; // Número de bolas
 
-let bugs = [];
-let numBugs = 40;
-let particles = [];
+let particles = []; //Lista donde se almacenan las parti
 
 let sel;
 let histo;
 let List = [] ;
 let sliderm;
 let temperatura;
+
 let valSlider = 0;
 let newValSlider = 0;
 
@@ -36,16 +35,16 @@ function setup() {
   table = new Table(-250, -200, 300, 300); //Caja 2D donde se distribuyen las bolas
   histo= new Histo(140, -200, 370, 370);  //Histograma de velocidades 
 
-  sel = createSelect();
+  sel = createSelect(); //Opciones de los tipos de distribuciones iniciales
   sel.option('Distribución Uniforme')
   sel.option('Distribución Normal')
   sel.option('Solo una particula')
-  sel.position(270, 50)
+  sel.position(270, 50) //Posición del botón
   //textAlign(CENTER)
 
 
   // creacion de un deslizador para variar la temperatura
-  temperatura = createSlider(0, 30, newValSlider, 3);
+  temperatura = createSlider(0, 30, newValSlider, 3); // Valor de la temperatura, por default es cero
   temperatura.position(windowWidth - 1100, windowHeight / 2 + 200);
   temperatura.style('width', '200px');
   valSlider = temperatura.value();
@@ -65,9 +64,9 @@ function setup() {
   }
  
 
-  temperatura.changed(cambioTemp);
-  sel.changed(cambioTemp);
-  
+  temperatura.changed(cambioTemp); //Evento cuando se cambia la temperatura se llama la función cambioTemp
+  sel.changed(cambioTemp); //Evento cuando se selecciona una nueva distribución inicial de velocidades 
+                           //se llama función cambioTemp
  
   // Creación de un botón que permite guardar las velocidades en el instante que se presiona, mediante
   // la función saveASText.
@@ -96,7 +95,7 @@ function draw() {
 
 
   table.show(); //Muestra la caja 2D
-  text("Bines = " + bins, 450, -280);
+  
   for (let i = 0; i < balls.length; i++) {
     for (let j = i; j < balls.length; j++) {
       if (i !== j) {
@@ -130,17 +129,22 @@ function draw() {
   let colort = temperatura.value(); //Asigna valor de deslizador de temperatura para asociar a color de llamas
   //fogon.show(colort);
 
+  //Texto donde se muestran el número de colisiones, el tiempo transcurrido
+  // y el número de bines
   text("Colisiones = " + nfc(collisions, 0), 300, -280);
   text("Tiempo = " + nfc(t, 2), 300, -260);
+  text("Bines = " + bins, 450, -280);
   
   //Reiniciamos las listas de velocidades y frecuencia 
   V.splice(0, V.length); 
   List.splice(0, List.length);
 
+  //Creación de particulas aleatorias para fogón simulado
   for (let i = 0; i < 5; i++) {
-    let p = new Particle();
-    particles.push(p);
+    let p = new Particle(); //Se instancia un objeto de la clase Particle
+    particles.push(p); //Se agregan esos objetos a una lista llamada particles
   }
+  //Se hace un ciclo por las partículas donde se llaman las funciones definidas en la clase Particle
   for (let i = particles.length - 1; i >= 0; i--) {
     particles[i].update();
     particles[i].show();
@@ -148,28 +152,32 @@ function draw() {
       particles.splice(i, 1);
     }
   }
-  fill(0, 0, 0);
-  rect(-250, 140, 300, 30);
+  fill(0, 0, 0); //Color de la base del fogón
+  rect(-250, 140, 300, 30); //Posición de la base del fogón
 
 }
 
 
-
+//Clase donde se hace la simulación del fogón
 class Particle {
   constructor() {
-  let valSlider = temperatura.value();
-    this.x = random(-240, 40);
-    this.y = 140;
-    this.vx = random(-1, 1);
-    this.vy = random(-1.6, -0.5);
-    this.alpha = 140+valSlider*3;
-    this.d = 12 + valSlider/7;
+    //Se inicializan las variables a usar
+  let valSlider = temperatura.value(); //Se actualiza el valor de temperatura
+    this.x = random(-240, 40); //Rango de posiciones en x donde se van a crear aleatoriamente las partículas
+                               // que simulan las llamas del fogón
+    this.y = 140; //Posición en el eje "y" desde donde se van a generar las partículas (llamas)
+    this.vx = random(-1, 1); //Velocidad de las partículas en el eje x
+    this.vy = random(-1.6, -0.5); //Velocidad de las partículas en el y
+    this.alpha = 140+valSlider*3; //Parámetro relacionado con la cantidad de partículas que se van a generar
+    this.d = 12 + valSlider/7; //Radio de las partículas, aumenta cuando se aumenta la temperatura
   }
 
+  //Función que valida hasta donde se mueven las partículas
   finished() {
-    return this.alpha < 0;
+    return this.alpha < 0; 
   }
 
+  //Función donde se actualizan las velocidades y y los parámetros alpha y d
   update() {
     this.x += this.vx;
     this.y += this.vy;
@@ -177,9 +185,11 @@ class Particle {
     this.d -= random(0.05, 0.1);
   }
 
+  //Función para mostrar las partículas que simulan la llama del fogón
   show() {
   let valSlider = temperatura.value();
     noStroke();
+    // Color con e que se llenan las bolas que simulan el fogón
     fill(random(210,250), random(160- valSlider*3, 180-valSlider*3), 10, this.alpha);
     ellipse(this.x, this.y, this.d);
   }
@@ -188,17 +198,23 @@ class Particle {
 
 
 
-
+//Función que es llamada cuando se cambia la temperatura o se selecciona un nuevo tipo de
+// distribución inicial de velocidades
 function cambioTemp() {
-  let valSlider = temperatura.value(); //Asignar el valor del 
-  balls.splice(0,balls.length);
+  let valSlider = temperatura.value(); //Se obtiene el valor de temperatura nuevo
+  balls.splice(0,balls.length); //Se reinician las bolas del gas de partículas
 
-  let item = sel.value();
+  //Para seleccionar cuál distribución inicial de velocidades se usará
+  let item = sel.value(); //
   particles.splice(0,particles.length);
   //p.splice(0,p.length);
 
 
+  //Se crean las partículas con la distribución de velocidad
+  // dependiendo de la opción escogida anteriormente
+  // y se aumenta la magnitud de la velocidad cuando se aumente la barra móvil de la temperatura
 
+  //Cuando se selecciona distribución uniforme
   if (item == "Distribución Uniforme"){
     for(let i = 0; i<N; i++) {
       balls.push(new Ball(10, createVector(random(-230,30),random(-180,80)), createVector(random(-10 - valSlider ,10 + valSlider), random(-10 - valSlider ,10 + valSlider))));
@@ -212,6 +228,7 @@ function cambioTemp() {
     }
   }
 
+  //Cuando se selecciona distribución normal
   if (item == "Distribución Normal"){
     for(let i = 0; i<N; i++) {
       balls.push(new Ball(10, createVector(random(-230,30),random(-180,80)), createVector(randomGaussian(0,3+(valSlider/2)), randomGaussian(0,3+(valSlider/2)))));
@@ -225,6 +242,7 @@ function cambioTemp() {
     }
   } 
   
+  //Cuando se selecciona solo una partícula (sólo una partícula con velocidad inicial)
   if (item == "Solo una particula"){
     for(let i = 0; i<N; i++) {
       if (i==0){
@@ -242,7 +260,7 @@ function cambioTemp() {
     }
   } 
 
-
+//se reinician los conteos de tiempo y de colisiones
 t = 0;
 collisions = 0;
 
@@ -293,20 +311,20 @@ let Histo = function (_x, _y, _w, _h) {
   this.h = _h; //alto de histograma
   
 
-  this.show = function (_val) { //definicion de función show para el hsitograma
+  this.show = function (_val) { //Definicion de función show para el histograma
     this.val = _val;
     noStroke();
     fill(255,255,255); 
-    rect(this.x, this.y, this.w, this.h); //espacio para el histograma
-    fill(0);
-    rect(this.x+26, this.y+this.h-50, this.w-26, 2); //eje x
+    rect(this.x, this.y, this.w, this.h); //Espacio para el histograma
+    fill(0);  //Color
+    rect(this.x+26, this.y+this.h-50, this.w-26, 2); //Eje x
     textStyle(BOLD);
     text('velocidades',this.x+this.w/2 -15 , this.y+this.h -20); //Etiqueta eje x
-    fill(0);
-    rect(this.x+26, this.y, 2, this.h-50); //eje y
+    fill(0); //Color
+    rect(this.x+26, this.y, 2, this.h-50); //Eje y
     text('N',this.x+5 ,this.y+this.h/2 - 10); //Etiqueta eje x
 
-    fill(0,0,0);
+    fill(0,0,0);  //Color
     stroke(0,76,153);
 
   // Definiendo las barras para que se actualicen constantemente
@@ -326,20 +344,19 @@ let Histo = function (_x, _y, _w, _h) {
 let Ball = function (_r, _pos, _vel) {
   
   //Variables de una bola 
-  this.r = _r; //radio
-  this.pos = _pos;
-  this.vel = _vel;
-  this.mass = 1; // masa por defecto 1
+  this.r = _r; //Radio
+  this.pos = _pos;  //Posición
+  this.vel = _vel; //Velocidad
+  this.mass = 1; //Masa por defecto 1
 
 
   this.show = function() { // Muestra la bola en su posición y color
     noStroke();
-    fill(0,76,153);
+    fill(0,76,153);  //Color bolas
     ellipse(this.pos.x, this.pos.y, this.r, this.r);
   }
 
   this.update = function () { 
-    //
 
     // Actualiza la posición de las bolas en un tiempo dt
     this.pos.x += this.vel.x * dt;
