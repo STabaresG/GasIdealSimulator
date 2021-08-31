@@ -1,3 +1,11 @@
+/* ***********************************************************
+ * ******* SIMULACION GAS IDEAL *****************
+ * ***********************************************************
+ * * Autores: Santiago Tabares, Andres Muñoz, Jhoan Eusse    *
+ * * Institución: Universidad de Antioquía                   *
+ * ***********************************************************/
+
+
 // Inicialización de todas las variables de la simulación 
 let canvas;
 
@@ -5,7 +13,7 @@ let table;
 let balls = [];
 let N = 130; // Número de bolas
 
-let particles = []; //Lista donde se almacenan las parti
+let particles = []; //Lista donde se almacenan las particulas
 
 let sel;
 let histo;
